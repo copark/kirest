@@ -1,0 +1,6 @@
+APP_NAME = 'Kiwoom Rest API'
+
+DEFAULT_FONT = 'Lucida'
+DEFAULT_FONT_SIZE = 12
+
+DEBUG = True
