@@ -9,7 +9,6 @@ DIST_DIR := dist
 
 ifeq ($(OS),Windows_NT)
     OS := windows
-    RM := rmdir
 else
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Linux)
@@ -18,7 +17,6 @@ else
     ifeq ($(UNAME_S),Darwin)
         OS := mac
     endif
-	RM := rm
 endif
 
 MAIN := $(SRC_DIR)/main.py 
@@ -28,10 +26,12 @@ ifeq ($(OS),windows)
     PYTHON=python.exe
     VENV_PYTHON := $(VENV_DIR)/Scripts/python.exe
     VENV_PYTHONINSTALLER := $(VENV_DIR)/Scripts/pyinstaller.exe
+    RM := rmdir
 else
     PYTHON=python3
     VENV_PYTHON := $(VENV_DIR)/bin/python
     VENV_PYTHONINSTALLER := $(VENV_DIR)/bin/pyinstaller
+    RM := rm
 endif
 
 run:
