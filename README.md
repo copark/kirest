@@ -10,11 +10,13 @@
    키움RestAPI 사용 신청
    
        https://openapi.kiwoom.com/intro/serviceInfo
-## 실행
-    make run
 ## 설치하기
+    실행에 필요한 모듈 설치
     make install
+## 실행    
+    make run
 ## 바이너리 생성하기
     make dist
+    참고로 dist폴더에 window, mac 실행 파일 존재함.
 
 
