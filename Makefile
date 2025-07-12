@@ -25,9 +25,11 @@ MAIN := $(SRC_DIR)/main.py
 
 VENV_DIR := venv
 ifeq ($(OS),windows)
+    PYTHON=python.exe
     VENV_PYTHON := $(VENV_DIR)/Scripts/python.exe
     VENV_PYTHONINSTALLER := $(VENV_DIR)/Scripts/pyinstaller.exe
 else
+    PYTHON=python3
     VENV_PYTHON := $(VENV_DIR)/bin/python
     VENV_PYTHONINSTALLER := $(VENV_DIR)/bin/pyinstaller
 endif
@@ -39,7 +41,7 @@ build: install
 	@$(VENV_PYTHON) $(MAIN)
 
 venv:
-	python -m venv $(VENV_DIR)
+	@$(PYTHON) -m venv $(VENV_DIR)
 	@$(VENV_PYTHON) -m pip install --upgrade pip
 	@$(VENV_PYTHON) -m pip install -r requirements.txt
 
@@ -52,7 +54,7 @@ dist:
 clean:
 ifeq ($(OS),windows)
 	@rmdir /s /q $(VENV_DIR)
-	rmdir /s /q "$(SRC_DIR)/__pycache__"
+	@rmdir /s /q "$(SRC_DIR)/__pycache__"
 	@rmdir /s /q $(BUILD_DIR)
 	@rmdir /s /q $(DIST_DIR)
 else
