@@ -32,8 +32,18 @@ class Util:
 class UxUtil:
     @staticmethod
     def init_label(parent, text):
-        return tk.Label(parent, text=text, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), anchor="w", justify="left").pack(pady=10)
+        return tk.Label(parent, text=text, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), 
+                        anchor=tk.W,justify=tk.LEFT).pack(padx=10, pady=10, anchor=tk.W)
+
     
+    @staticmethod
+    def init_label_entry(parent, text, row, textvariable, state=tk.NORMAL):
+        label = tk.Label(parent, text=text, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE))
+        label.grid(row=row, column=0, padx=5)
+        entry = tk.Entry(parent, state=state, textvariable=textvariable, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=40)
+        entry.grid(row=row, column=1, padx=5)
+        return label, entry
+
 
     @staticmethod
     def show_info(message):

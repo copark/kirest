@@ -33,7 +33,7 @@ class MyApp:
 
 
     def init_left_frame(self):
-        left_frame = tk.Frame(self.root, width=600)
+        left_frame = tk.Frame(self.root, width=400)
         left_frame.pack(side='left', fill='y')
 
         self.init_select_frame(left_frame)
@@ -42,7 +42,7 @@ class MyApp:
 
 
     def init_right_frame(self):
-        right_frame = tk.Frame(self.root, width=800)
+        right_frame = tk.Frame(self.root, width=624)
         right_frame.pack(side='left', fill='y')
 
         self.init_order_frame(right_frame)
@@ -71,19 +71,19 @@ class MyApp:
         combo_options_value = ['0', '3', '62', '10', '13', '20', '23']
 
         line = tk.Frame(frame)
-        line.pack()
-        tk.Label(line, text='종목명:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=1, column=0, padx=5)
-        stock_name = tk.Entry(line, textvariable=self.order_name_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30)
+        #line.pack()
+        tk.Label(order_block, text='종목명:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=1, column=0, padx=5)
+        stock_name = tk.Entry(order_block, textvariable=self.order_name_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30)
         stock_name.grid(row=1, column=1, padx=5)
-        tk.Label(line, text='종목코드:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=2, column=0, padx=5)
-        stock_code = tk.Entry(line, textvariable=self.order_code_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30)
+        tk.Label(order_block, text='종목코드:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=2, column=0, padx=5)
+        stock_code = tk.Entry(order_block, textvariable=self.order_code_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30)
         stock_code.grid(row=2, column=1, padx=5)
-        tk.Label(line, text='주문수량:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=3, column=0, padx=5)
-        tk.Entry(line, textvariable=self.order_qty_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30).grid(row=3, column=1, padx=5)
-        tk.Label(line, text='주문단가:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=4, column=0, padx=5)
-        tk.Entry(line, textvariable=self.order_uv_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30).grid(row=4, column=1, padx=5)
-        tk.Label(line, text='매매구분:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=5, column=0, padx=5)
-        trade_combo = ttk.Combobox(line, values=combo_options, state="readonly")
+        tk.Label(order_block, text='주문수량:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=3, column=0, padx=5)
+        tk.Entry(order_block, textvariable=self.order_qty_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30).grid(row=3, column=1, padx=5)
+        tk.Label(order_block, text='주문단가:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=4, column=0, padx=5)
+        tk.Entry(order_block, textvariable=self.order_uv_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30).grid(row=4, column=1, padx=5)
+        tk.Label(order_block, text='매매구분:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=5, column=0, padx=5)
+        trade_combo = ttk.Combobox(order_block, values=combo_options, state="readonly")
         trade_combo.grid(row=5, column=1, padx=5)
         trade_combo.current(0)
 
@@ -114,7 +114,7 @@ class MyApp:
 
         columns = ("주문번호", "종목명", "구분", "주문가", '미체결수량', '거래소')
         self.os_tree = ttk.Treeview(line, columns=columns, show="headings", selectmode="browse", height=5)
-        self.os_tree.pack(side='left', fill=tk.BOTH, expand=True)
+        self.os_tree.pack(anchor="w", side='left', fill=tk.BOTH, expand=True, padx=10, pady=(0,10))
         scrollbar = ttk.Scrollbar(line, orient="vertical", command=self.os_tree.yview)
         scrollbar.pack(side="right", fill="y")
 
@@ -182,18 +182,38 @@ class MyApp:
 
         columns = ("종목명", "매입가", "현재가", "평가손익", "수익율", "가능수량", "보유수량", )
         self.balance_tree = ttk.Treeview(line, columns=columns, show="headings", selectmode="browse")
-        self.balance_tree.pack(side='left', fill=tk.BOTH, expand=True, padx=(0,10), pady=(0, 20))
-        scrollbar = ttk.Scrollbar(line, orient="vertical", command=self.balance_tree.yview)
-        scrollbar.pack(side="right", fill="y")
+        self.balance_tree.pack(anchor=tk.W, side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=(0,10))
+        self.balance_tree_sort_orders = {col: False for col in columns}
 
-        
+        scrollbar = ttk.Scrollbar(line, orient=tk.VERTICAL, command=self.balance_tree.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
         # 헤더 생성
         for col in columns:
-            self.balance_tree.heading(col, text=col)
+            self.balance_tree.heading(col, text=col, command=lambda _col=col: self.balance_sort_by_column(_col))
             self.balance_tree.column(col, anchor="center")
 
         self.balance_tree.bind("<<TreeviewSelect>>", self.balance_tree_on_select)
-           
+
+
+    def balance_sort_by_column(self, col):
+        column_map = {
+            '종목명': 'stk_nm',
+            '매입가': 'pur_pric',
+            '현재가': 'cur_prc',
+            '평가손익': 'evltv_prft',
+            '수익율': 'prft_rt',
+            '가능수량': 'trde_able_qty',
+            '보유수량': 'rmnd_qty',
+        }
+
+        reverse = self.balance_tree_sort_orders[col]
+
+        mapped_col = column_map.get(col, col)  # 기본값은 col        
+        self.balance_data.sort(key=lambda x: x.get(mapped_col, ""), reverse=reverse)
+        self.balance_tree_sort_orders[col] = not reverse
+        self.update_balance_status(self.balance_data)
+
 
     def update_balance_status(self, data):       
         for item in self.balance_tree.get_children():
@@ -202,8 +222,9 @@ class MyApp:
         if data == []:
             return
         
-        #         columns = ("종목명", "매입가", '현재가', "평가손익", "수익율", '가능수량', '보유수량', )
-        for item in data:
+        self.balance_data = data        
+        # columns = ("종목명", "매입가", '현재가', "평가손익", "수익율", '가능수량', '보유수량', )
+        for item in self.balance_data:
             values = (
                 item.get("stk_nm", ""),
                 Util.strip_leading_zeros(item.get("pur_pric", "")),
@@ -212,7 +233,6 @@ class MyApp:
                 item.get("prft_rt", ""),
                 Util.strip_leading_zeros(item.get("trde_able_qty", "")),
                 Util.strip_leading_zeros(item.get("rmnd_qty", "")),
-                
             )
             self.balance_tree.insert("", tk.END, values=values)
 
@@ -222,13 +242,13 @@ class MyApp:
         if not selected_item:
             return        
 
-        record = self.balance_tree.item(selected_item, 'values')  # 튜플 형태로 가져옴
+        record = self.balance_tree.item(selected_item, 'values')
         stock = self.stocklist.find_by_name(record[0])
         if stock != None:
-            self.order_code_value.set(stock.code)
-        self.order_name_value.set(record[0])
-        self.order_uv_value.set(Util.remove_commas(record[2]))
-        self.order_qty_value.set(Util.remove_commas(record[5]))
+            self.order_code_value.set(stock.code) #종목코드
+        self.order_name_value.set(record[0]) # 종목명
+        self.order_uv_value.set(Util.remove_commas(record[1])) # 매입가
+        self.order_qty_value.set(Util.remove_commas(record[5])) # 가능수량
 
 
     def log_message(self,tag, msg):
@@ -254,18 +274,14 @@ class MyApp:
         self.appKey_value = StringVar()
         self.appSecret_value = StringVar()
 
-        title_label = tk.Label(frame, text='계정 선택', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE))
-        title_label.pack(pady=10)
+        UxUtil.init_label(frame, '계정 선택')
 
         select_block = tk.Frame(frame, bd=1, relief='solid', padx=10, pady=10)
-        select_block.pack(padx=10, fill='x')
-
+        select_block.pack(padx=10, fill=tk.X)
         account_label = tk.Label(select_block, text='계정:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE))
         account_label.grid(row=0, column=0, padx=5)
-
         options = Model.account_list()
         current = Model.current_user()
-
         self.combo = ttk.Combobox(select_block, values=options, state="readonly")
         if current != None:
             account = f'{current[USER_ACCOUNT]} {current[USER_NAME]}'
@@ -275,18 +291,11 @@ class MyApp:
         self.combo.grid(row=0, column=1, padx=5)
         self.combo.bind("<<ComboboxSelected>>",  self.on_account_select)
 
-        select_block = tk.Frame(frame, bd=1, relief='solid', padx=10, pady=10)
-        select_block.pack(padx=10, fill='x')
+        select_block = tk.Frame(frame, bd=1, relief='solid', padx=10, pady=5)
+        select_block.pack(padx=10, pady=10, fill='x')
 
-        appKey_label = tk.Label(select_block, text='AppKey:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE))
-        appKey_label.grid(row=1, column=0, padx=5)
-        appKey_entry = tk.Entry(select_block, state='readonly', textvariable=self.appKey_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30)
-        appKey_entry.grid(row=1, column=1, padx=5)
-
-        appSecret_label = tk.Label(select_block, text='AppSecret:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE))
-        appSecret_label.grid(row=2, column=0, padx=5)
-        appSecret_entry = tk.Entry(select_block, state='readonly', textvariable=self.appSecret_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30)
-        appSecret_entry.grid(row=2, column=1, padx=5)    
+        UxUtil.init_label_entry(select_block, 'AppKey:', 1, self.appKey_value, state='readonly')
+        UxUtil.init_label_entry(select_block, 'AppSecret:', 2, self.appSecret_value, state='readonly')
 
         line = tk.Frame(frame)
         line.pack()
@@ -322,6 +331,7 @@ class MyApp:
     
     def request_pending_order(self):
         if self.kiwoom == None:
+            UxUtil.show_warning('로그인이 필요합니다.')
             return
 
     	# 2. 요청 데이터
@@ -357,8 +367,10 @@ class MyApp:
 
 
     def request_balance(self):
-        print ('request balance')
-
+        if self.kiwoom == None:
+            UxUtil.show_warning('로그인이 필요합니다.')
+            return
+                                
         params = {
             "qry_tp": "1", # 상장폐지조회구분 0:전체, 1:상장폐지종목제외
 		    "dmst_stex_tp": Model.market() # 국내거래소구분 KRX:한국거래소,NXT:넥스트트레이드
@@ -387,15 +399,14 @@ class MyApp:
 
     def request_order(self, cmd, market, code, qty, uv, trade):
         if self.kiwoom == None:
+            UxUtil.show_warning('로그인이 필요합니다.')
             return
 
-        if DEBUG:
-            print (f'request_order trade = {trade}')        
         if not self.kiwoom.is_valid_order(code, qty, uv):
-            Util.show_warning(f'주문을 확인하세요. {code} {qty} {uv}')
+            UxUtil.show_warning(f'주문을 확인하세요. {code} {qty} {uv}')
             return
                         
-        yesNo = Util.show_confirm('확인', f'주문하시겠습니까?')
+        yesNo = UxUtil.show_confirm('확인', f'주문하시겠습니까?')
         if not yesNo:
             return
 
@@ -412,13 +423,12 @@ class MyApp:
         self.log_message('order', responses[0])
         UxUtil.show_info(responses[0]['return_msg'])
 
+
     def request_cancel_order(self, cmd, market, order, code, qty):
         if self.kiwoom == None:
+            UxUtil.show_warning('로그인이 필요합니다.')
             return
-
-        if DEBUG:
-            print (f'request_cancel_order')
-                        
+                                
         yesNo = UxUtil.show_confirm('확인', f'주문을 취소 하시겠습니까?')
         if not yesNo:
             return
@@ -462,8 +472,7 @@ class MyApp:
         market_value = StringVar()
         self.info_value = StringVar()
 
-        title_label = tk.Label(frame, text='계좌 정보', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE))
-        title_label.pack(pady=10)
+        UxUtil.init_label(frame, '계좌 정보')
 
         select_block = tk.Frame(frame, bd=1, relief='solid', padx=10, pady=10)
         select_block.pack(padx=10, fill='x')
@@ -489,23 +498,15 @@ class MyApp:
         r_appKey_value = StringVar()
         r_appSecret_value = StringVar()
 
-        title_label = tk.Label(frame, text='계정 등록', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE))
-        title_label.pack(pady=10)
+        UxUtil.init_label(frame, '계정 등록')
 
         regist_block = tk.Frame(frame, bd=1, relief='solid', padx=10, pady=10)
         regist_block.pack(padx=10, fill='x')
 
-        tk.Label(regist_block, text='이름:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=0, column=0, padx=5)
-        tk.Entry(regist_block, textvariable=r_name_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30).grid(row=0, column=1, padx=5)
-
-        tk.Label(regist_block, text='계정:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=1, column=0, padx=5)
-        tk.Entry(regist_block, textvariable=r_account_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30).grid(row=1, column=1, padx=5)
-
-        tk.Label(regist_block, text='AppKey:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=2, column=0, padx=5)
-        tk.Entry(regist_block, textvariable=r_appKey_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30).grid(row=2, column=1, padx=5)
-
-        tk.Label(regist_block, text='AppSecret:', font=(DEFAULT_FONT, DEFAULT_FONT_SIZE)).grid(row=3, column=0, padx=5)
-        tk.Entry(regist_block, textvariable=r_appSecret_value, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), width=30).grid(row=3, column=1, padx=5)
+        UxUtil.init_label_entry(regist_block, '이름:', 0, r_name_value)
+        UxUtil.init_label_entry(regist_block, '계정:', 1, r_account_value)
+        UxUtil.init_label_entry(regist_block, 'AppKey:', 2, r_appKey_value)
+        UxUtil.init_label_entry(regist_block, 'AppSecret:', 3, r_appSecret_value)
 
         line = tk.Frame(frame)
         line.pack()
