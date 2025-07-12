@@ -9,7 +9,7 @@ DIST_DIR := dist
 
 ifeq ($(OS),Windows_NT)
     OS := windows
-	RM := rmdir
+    RM := rmdir
 else
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Linux)
