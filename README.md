@@ -3,9 +3,12 @@
 
 ## 사전설치
    python 설치(공통)
+   
        brew install python (mac)
        brew install python-tk (mac)
+       
    키움RestAPI 사용 신청
+   
        https://openapi.kiwoom.com/intro/serviceInfo
 ## 실행
     make run
