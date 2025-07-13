@@ -2,12 +2,16 @@
     키움 RestAPI 사용하고 만원 받자
 
 ## 사전설치
-   python 설치(공통)
-   
-       brew install python (mac)
-       brew install python-tk (mac)
-       
-   키움RestAPI 사용 신청
+python 설치
+
+    brew install python (mac)
+    brew install python-tk (mac)
+    
+git 설치
+
+make 설치
+
+키움RestAPI 사용 신청
    
        https://openapi.kiwoom.com/intro/serviceInfo
 ## 설치하기
